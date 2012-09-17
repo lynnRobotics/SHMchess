@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="2011-logicnode-InferenceEngine" default="jar" basedir=".">
+	
+	<target name="jar" depends="manifest">
+		<jar destfile="deploy/2011-logicnode-InferenceEngine.jar" manifest="MANIFEST.MF">
+			<fileset dir="./bin" />
+		</jar>
+	</target>
+	
+	<target name="manifest">
+		<manifest file="MANIFEST.MF">
+			<attribute name="Main-Class" value="NTU.IntelM2M.logic.EnergySaving.InferenceEngine" />
+		</manifest>
+	</target>
+</project>

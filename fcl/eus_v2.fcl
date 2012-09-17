@@ -1,0 +1,61 @@
+
+
+FUNCTION_BLOCK eus	// Block definition (there may be more than one block per file)
+
+VAR_INPUT				// Define input variables
+	confidence : REAL;
+	eusType : REAL;
+	eusState : REAL;
+END_VAR
+
+VAR_OUTPUT				// Define output variable
+	priority : REAL;
+END_VAR
+
+FUZZIFY confidence		// Fuzzify input variable 
+	TERM low := (0, 1) (0.2, 1) (0.5,0); 
+	TERM mid := (0.2, 0) (0.5,1) (0.8,0);
+	TERM high := (0.5, 0) (0.8, 1) (1,1);
+END_FUZZIFY
+
+FUZZIFY eusType		// Fuzzify input variable 
+	TERM explicit := 1; 
+	TERM implicit := 2;
+END_FUZZIFY
+
+FUZZIFY eusState		// Fuzzify input variable 
+	TERM off := 1; 
+	TERM standby := 2;
+	TERM on := 3;
+END_FUZZIFY
+
+DEFUZZIFY priority			// Defzzzify output variable 
+	TERM p1 := (0,0) (1,1) (2,0);
+	TERM p2 := (1,0) (2,1) (3,0);
+	TERM p3 := (2,0) (3,1) (4,0);
+	TERM p4 := (3,0) (4,1) (5,0);
+	METHOD : COG;		// Use 'Center Of Gravity' defuzzification method
+	DEFAULT := 0;		// Default value is 0 (if no rule activates defuzzifier)
+END_DEFUZZIFY
+
+RULEBLOCK No1
+	AND : MIN;			// Use 'min' for 'and' (also implicit use 'max' for 'or' to fulfill DeMorgan's Law)
+	ACT : MIN;			// Use 'min' activation method
+	ACCU : MAX;			// Use 'max' accumulation method
+
+	RULE 1 : IF confidence IS high and eusState IS off THEN priority IS p1;
+	RULE 2 : IF confidence IS high and eusState IS standby THEN priority IS p1;
+	RULE 3 : IF confidence IS mid and eusState IS standby THEN priority IS p2;
+	RULE 4 : IF confidence IS mid and eusState IS standby THEN priority IS p2;
+	RULE 5 : IF confidence IS low and eusState IS standby THEN priority IS p3;
+	RULE 6 : IF confidence IS low and eusState IS standby THEN priority IS p3;
+	RULE 7 : IF confidence IS high and eusState IS on and eusType is explicit THEN priority IS p4;
+	RULE 8 : IF confidence IS mid and eusState IS on and eusType is explicit THEN priority IS p3;
+	RULE 9 : IF confidence IS low and eusState IS on and eusType is explicit THEN priority IS p2;
+	RULE 10 : IF confidence IS high and eusState IS on and eusType is implicit THEN priority IS p3;
+	RULE 11 : IF confidence IS mid and eusState IS on and eusType is implicit THEN priority IS p2;
+	RULE 12 : IF confidence IS low and eusState IS on and eusType is implicit THEN priority IS p1;
+END_RULEBLOCK
+
+END_FUNCTION_BLOCK
+
